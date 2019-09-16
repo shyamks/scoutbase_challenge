@@ -40,18 +40,24 @@ const func = (req, res, next) => {
     })
     promise.then(data => {
         const context = { data }
-
-        const html = ReactDOMServer.renderToString(
-            <StaticRouter location={req.baseUrl} context={context}>
-                <ApolloProvider client={client}>
-                    <App />
-                </ApolloProvider>
-            </StaticRouter>
-        );
+        let html
+        try {
+            html = ReactDOMServer.renderToString(
+                <StaticRouter location={req.baseUrl} context={context}>
+                    <ApolloProvider client={client}>
+                        <App />
+                    </ApolloProvider>
+                </StaticRouter>
+            );
+        }
+        catch (e) {
+            console.log(e,'eeroor')
+            return res.status(404).end()
+        }
         fs.readFile(filePath, 'utf8', (err, htmlData) => {
             if (err) {
                 console.error('err', err);
-                return res.status(404)
+                return res.status(404).end()
             }
 
             const modules = [];

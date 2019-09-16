@@ -6,6 +6,7 @@ import styled from 'styled-components'
 
 import './App.css';
 import Routes from './Routes';
+import ErrorBoundary from './ErrorBoundary';
 
 function App() {
   return (
@@ -22,9 +23,11 @@ function App() {
         </ul>
       </nav>
 
-      <Switch>
-        {renderRoutes(Routes)}
-      </Switch>
+      <ErrorBoundary>
+        <Switch>
+          {renderRoutes(Routes)}
+        </Switch>
+      </ErrorBoundary>
     </div>
 
   );
