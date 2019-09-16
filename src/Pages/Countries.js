@@ -16,17 +16,25 @@ const Row = styled.div`
 `
 
 function Countries(props) {
-  const { called, error, loading, data: countries } = useQuery(gql(GET_ALL_COUNTRIES));
-  const { serverData, staticContext } = props
-  // console.log(props,'Countries Page')
+  const [loadCountry, { called, loading, error, data: countries }] = useLazyQuery(gql(GET_ALL_COUNTRIES));
+  const [result, setResult] = React.useState(null)
+  const { staticContext } = props
+  React.useEffect(() => {
+    if (window.__ROUTE_DATA__ || countries) {
+      setResult(window.__ROUTE_DATA__ || { data: countries })
+      if (window.__ROUTE_DATA__)
+        delete window.__ROUTE__DATA
+    }
+    else {
+      loadCountry()
+    }
+  }, [countries])
 
-  // let par
-  // console.log(staticContext.data.data,'props')
   let show = <> </>
   if (loading && !staticContext) show = <>Loading</>
   if (error && !staticContext) show = <>Error</>
-  else if ( staticContext || countries) {
-    let showCountries = (staticContext && staticContext.data.data.countries) || countries.countries
+  else if (staticContext || result) {
+    let showCountries = (staticContext && staticContext.data.data.countries) || (result && result.data.countries)
     show = showCountries.map((country, index) => {
       return (
         <Row>
@@ -49,13 +57,13 @@ function Countries(props) {
   )
 }
 
-function HigherOrder(props) {
-  return <AppContext.Consumer>
-    {value => {
-      let { serverData } = value || {}
-      return <Countries {...props} serverData={serverData} />
-    }}
-  </AppContext.Consumer>
-}
+// function HigherOrder(props) {
+//   return <AppContext.Consumer>
+//     {value => {
+//       let { serverData } = value || {}
+//       return <Countries {...props} serverData={serverData} />
+//     }}
+//   </AppContext.Consumer>
+// }
 
-export default HigherOrder
+export default Countries
