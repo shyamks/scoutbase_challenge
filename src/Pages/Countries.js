@@ -5,7 +5,6 @@ import { gql } from 'apollo-boost';
 import React from 'react';
 
 import { GET_ALL_COUNTRIES } from '../constants';
-import AppContext from '../appContext'
 
 const CountriesContainer = styled.div`
   display: flex;
@@ -56,14 +55,5 @@ function Countries(props) {
     </div>
   )
 }
-
-// function HigherOrder(props) {
-//   return <AppContext.Consumer>
-//     {value => {
-//       let { serverData } = value || {}
-//       return <Countries {...props} serverData={serverData} />
-//     }}
-//   </AppContext.Consumer>
-// }
 
 export default Countries
