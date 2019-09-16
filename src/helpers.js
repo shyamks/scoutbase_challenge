@@ -14,11 +14,19 @@ export const loadDataFromServer = (key, data) => {
             })
 
         case 'country':
-            return apolloFetch({
-                query: (GET_COUNTRY),
-                variables: { countryCode: data }
-            })
+            if (validateCountryParams(data)) {
+                return apolloFetch({
+                    query: (GET_COUNTRY),
+                    variables: { countryCode: data[0].substr(1) }
+                })
+            }
+            else {
+                return Promise.resolve(null)
+            }
+
     }
-
-
+}
+// Validation if required here
+const validateCountryParams = (params) => {
+    return true
 }

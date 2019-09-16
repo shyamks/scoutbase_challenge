@@ -1,5 +1,5 @@
 import styled from 'styled-components'
-import { useQuery, useLazyQuery } from '@apollo/react-hooks'
+import { useLazyQuery } from '@apollo/react-hooks'
 import { gql } from 'apollo-boost';
 import { GET_COUNTRY } from '../constants';
 import React from 'react';
@@ -9,22 +9,31 @@ const CountryContainer = styled.div`
   flex-direction: column;
 `
 
-function Country({ match }) {
-    const [loadCountry, { called, loading, data }] = useLazyQuery(gql(GET_COUNTRY));
-    let code = match.params.code
-    console.log(code,'code')
+function Country({ match, staticContext }) {
+    const [loadCountry, { called, loading, error, data: country }] = useLazyQuery(gql(GET_COUNTRY));
+    let { code } = match.params
+
+    const [result, setResult] = React.useState(null)
     React.useEffect(() => {
-        loadCountry({ variables: { countryCode: code } })
-    }, [])
-    if (loading) { return <p>Loading...</p> }
+        if (window.__ROUTE_DATA__ || country) {
+            setResult(window.__ROUTE_DATA__ || { data: country })
+            if (window.__ROUTE_DATA__)
+                delete window.__ROUTE_DATA__
+        }
+        else {
+            loadCountry({ variables: { countryCode: code } })
+        }
+    }, [country])
+    // console.log(!staticContext && (loading || !called), 'status', loading, called, !!result, 'show me what is here')
     let countryData
-    if (data) {
-        let { country } = data
-        console.log(data, 'countryData')
-        if (country)
-            countryData = <div> Name- {country.name}, Phone- {country.phone}, Currency- {country.currency}</div>
-        else
-            countryData = <>There is no country with code {code}</>
+    let showCountry = (staticContext && staticContext.data.data.country) || (result && result.data.country)
+    if (showCountry) {
+        countryData = <div> Name- {showCountry.name}, Phone- {showCountry.phone}, Currency- {showCountry.currency}</div>
+    }
+    else if (!staticContext && (loading || !called)) countryData = <>Loading</>
+    else if (error && !staticContext) countryData = <>Error</>
+    else {
+        countryData = <>There is no country with code {code}</>
     }
 
     return (

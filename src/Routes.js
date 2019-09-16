@@ -14,12 +14,12 @@ const Routes = [
         path: '/countries',
         exact: true,
         component: Countries,
-        loadData: () => loadDataFromServer('countries')
+        loadData: (params) => loadDataFromServer('countries')
     },
     {
         path: '/countries/:code',
         component: Country,
-        loadData: () => loadDataFromServer('country')
+        loadData: (params) => loadDataFromServer('country', params)
     },
     {
         component: NotFound

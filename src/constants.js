@@ -5,7 +5,14 @@ export const GET_ALL_COUNTRIES = `
   countries{
     name
     code
+    languages {
+      name
+      native
+    }
     native
+    continent {
+      name
+    }
   }
 }
 `

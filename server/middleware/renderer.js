@@ -23,15 +23,12 @@ const fs = require("fs");
 
 const func = (req, res, next) => {
 
-    console.log(req.baseUrl, 'req')
-    // get the html file created by CRA's build tool
     const filePath = path.resolve(__dirname, '..', '..', 'build', 'index.html');
 
     const CurrentRoute = Routes.find(route => matchPath(req.baseUrl, route))
-    // console.log(CurrentRoute, 'currentRoute')
     let promise
     if (CurrentRoute.loadData) {
-        promise = CurrentRoute.loadData()
+        promise = CurrentRoute.loadData(req.params)
     }
     else {
         promise = Promise.resolve(null)
@@ -39,12 +36,10 @@ const func = (req, res, next) => {
 
     promise.catch(err => {
         console.error('err', err);
-        return res.status(404).end()
+        return res.status(404)
     })
     promise.then(data => {
         const context = { data }
-        console.log(context, 'context')
-        // render the app as a string
 
         const html = ReactDOMServer.renderToString(
             <StaticRouter location={req.baseUrl} context={context}>
@@ -56,13 +51,10 @@ const func = (req, res, next) => {
         fs.readFile(filePath, 'utf8', (err, htmlData) => {
             if (err) {
                 console.error('err', err);
-                return res.status(404).end()
+                return res.status(404)
             }
 
             const modules = [];
-
-            
-
             const extraChunks = extractAssets(manifest, modules)
                 .map(c => `<script type="text/javascript" src="/${c}"></script>`);
 
